@@ -404,9 +404,40 @@
           </div>
         </div>
         <div v-else-if="currentPage === 'artist'" class="artist-page">
-          <h2 class="page-heading">画师</h2>
+          <div class="artist-search-bar">
+            <div class="artist-search-wrapper">
+              <input class="artist-search-input" type="text" placeholder="搜索画师或标签..." v-model="artistQuery" />
+            </div>
+          </div>
+          <div class="artist-grid">
+            <div class="artist-card" v-for="a in filteredArtists" :key="a.name">
+              <div class="artist-header">
+                <div class="artist-avatar">
+                  <img :src="a.avatar" :alt="a.name" />
+                </div>
+                <div class="artist-info">
+                  <h3 class="artist-name">{{ a.name }}</h3>
+                  <div class="artist-links">
+                    <a :href="a.pixiv" target="_blank" rel="noopener" class="pixiv-link">pixiv</a>
+                  </div>
+                  <div class="artist-tags" v-if="a.tags">
+                    <span class="tag" v-for="t in a.tags.split(', ')" :key="t">{{ t }}</span>
+                  </div>
+                </div>
+              </div>
+              <div class="artist-works" v-if="a.works && a.works.length">
+                  <div class="work-thumb" v-for="(w, wi) in a.works" :key="wi" @click="previewImg = w">
+                    <img :src="w" :alt="a.name + ' work ' + (wi+1)" loading="lazy" />
+              </div>
+            </div>
+          </div>
+        </div>      
         </div>
       </main>
+
+      <div class="lightbox" v-if="previewImg" @click="previewImg = ''">
+        <img :src="previewImg" class="lightbox-img" />
+      </div>
     </div>
   </div>
 </template>
@@ -417,6 +448,59 @@ import { ref, computed } from 'vue';
 const isDark = ref(true);
 const currentPage = ref('home');
 const searchQuery = ref('');
+const previewImg = ref('');
+const artistQuery = ref('');
+
+const filteredArtists = computed(() => {
+  const q = artistQuery.value.trim().toLowerCase();
+  if (!q) return artists;
+  return artists.filter(a => {
+    if (a.name.toLowerCase().includes(q)) return true;
+    if (a.tags && a.tags.toLowerCase().includes(q)) return true;
+    return false;
+  });
+});
+
+  const artists = [
+    { name: 'Noyu', avatar: '/my-navigation-site/images/artists/noyu.jpg', pixiv: 'https://www.pixiv.net/users/26040235', works: ['/my-navigation-site/images/artworks/noyu/1.jpg','/my-navigation-site/images/artworks/noyu/2.jpg','/my-navigation-site/images/artworks/noyu/3.jpg'] , tags: '少女, 厚涂, 奇幻, 氛围, 人外, 哥特, 色彩'},
+    { name: '望月けい', avatar: '/my-navigation-site/images/artists/mochizuki_kei.jpg', pixiv: 'https://www.pixiv.net/users/1193008', works: ['/my-navigation-site/images/artworks/mochizuki_kei/1.jpg','/my-navigation-site/images/artworks/mochizuki_kei/2.jpg','/my-navigation-site/images/artworks/mochizuki_kei/3.jpg'] , tags: '厚涂, 帅气, 风格化, 原创, 个性, 三丽鸥, 设计'},
+    { name: 'neco', avatar: '/my-navigation-site/images/artists/neco.jpg', pixiv: 'https://www.pixiv.net/users/777703', works: ['/my-navigation-site/images/artworks/neco/1.jpg','/my-navigation-site/images/artworks/neco/2.jpg','/my-navigation-site/images/artworks/neco/3.jpg'] , tags: '机甲, 科幻, 重装, 少女, 武器, 军武, 设计'},
+    { name: '室埴 ポコ', avatar: '/my-navigation-site/images/artists/murohani_poco.jpg', pixiv: 'https://www.pixiv.net/users/76266', works: ['/my-navigation-site/images/artworks/murohani_poco/1.jpg','/my-navigation-site/images/artworks/murohani_poco/2.jpg','/my-navigation-site/images/artworks/murohani_poco/3.jpg'] , tags: '机甲, 机械, 兽耳, 狐狸, 金发, 尾巴, 武器'},
+    { name: '赤倉＠画集発売中', avatar: '/my-navigation-site/images/artists/akakura.jpg', pixiv: 'https://www.pixiv.net/users/882569', works: ['/my-navigation-site/images/artworks/akakura/1.jpg','/my-navigation-site/images/artworks/akakura/2.jpg','/my-navigation-site/images/artworks/akakura/3.jpg'] , tags: '少女, 可爱, 天使, 恶魔, 制服, 绚丽, 色彩'},
+    { name: 'Anmi@画集発売中', avatar: '/my-navigation-site/images/artists/anmi.jpg', pixiv: 'https://www.pixiv.net/users/212801', works: ['/my-navigation-site/images/artworks/anmi/1.jpg','/my-navigation-site/images/artworks/anmi/2.jpg','/my-navigation-site/images/artworks/anmi/3.jpg'] , tags: '少女, 唯美, 百合, 治愈, 色彩, 花, 柔光'},
+    { name: 'アシマ / Ashima', avatar: '/my-navigation-site/images/artists/ashima.jpg', pixiv: 'https://www.pixiv.net/users/2642047', works: ['/my-navigation-site/images/artworks/ashima/1.jpg','/my-navigation-site/images/artworks/ashima/2.jpg','/my-navigation-site/images/artworks/ashima/3.jpg'] , tags: '少女, 幻想, 华丽, 花, 制服, 优雅, 可爱'},
+    { name: 'モ誰', avatar: '/my-navigation-site/images/artists/mosui.jpg', pixiv: 'https://www.pixiv.net/users/1878082', works: ['/my-navigation-site/images/artworks/mosui/1.jpg','/my-navigation-site/images/artworks/mosui/2.jpg','/my-navigation-site/images/artworks/mosui/3.jpg'] , tags: '厚涂, 韩系, 精致, 美少女, 笑容, 角色, 华丽'},
+    { name: 'イコモチ', avatar: '/my-navigation-site/images/artists/icomochi.jpg', pixiv: 'https://www.pixiv.net/users/801146', works: ['/my-navigation-site/images/artworks/icomochi/1.jpg','/my-navigation-site/images/artworks/icomochi/2.jpg','/my-navigation-site/images/artworks/icomochi/3.jpg'] , tags: '可爱, VTuber, hololive, FUWAMOCO, 同人, 兽耳, 萌'},
+    { name: 'あるてら', avatar: '/my-navigation-site/images/artists/arutera.jpg', pixiv: 'https://www.pixiv.net/users/483730', works: ['/my-navigation-site/images/artworks/arutera/1.jpg','/my-navigation-site/images/artworks/arutera/2.jpg','/my-navigation-site/images/artworks/arutera/3.jpg'] , tags: '少女, VTuber, 礼装, 长发, 色彩, 优雅, 动态'},
+    { name: '鬼针草', avatar: '/my-navigation-site/images/artists/guizhencao.jpg', pixiv: 'https://www.pixiv.net/users/6049901', works: ['/my-navigation-site/images/artworks/guizhencao/1.jpg','/my-navigation-site/images/artworks/guizhencao/2.jpg','/my-navigation-site/images/artworks/guizhencao/3.jpg'] , tags: '少女, 白丝, 制服, 黑丝, 短髮, 明日方舟, 绝对领域'},
+    { name: 'ヒトこもる', avatar: '/my-navigation-site/images/artists/hitokomoru.jpg', pixiv: 'https://www.pixiv.net/users/30837811', works: ['/my-navigation-site/images/artworks/hitokomoru/1.jpg','/my-navigation-site/images/artworks/hitokomoru/2.jpg','/my-navigation-site/images/artworks/hitokomoru/3.jpg'] , tags: '少女, 可爱, 日常, 治愈, 白髮, 兽耳, 笑容'},
+    { name: 'wlop', avatar: '/my-navigation-site/images/artists/wlop.jpg', pixiv: 'https://www.pixiv.net/users/2188232', works: ['/my-navigation-site/images/artworks/wlop/1.jpg','/my-navigation-site/images/artworks/wlop/2.jpg','/my-navigation-site/images/artworks/wlop/3.jpg'] , tags: '厚涂, 奇幻, 氛围, 光影, 史诗, 场景, 原创'},
+    { name: 'ASK', avatar: '/my-navigation-site/images/artists/ask.jpg', pixiv: 'https://www.pixiv.net/users/1980643', works: ['/my-navigation-site/images/artworks/ask/1.jpg','/my-navigation-site/images/artworks/ask/2.jpg','/my-navigation-site/images/artworks/ask/3.jpg'] , tags: '少女, 唯美, FGO, 和风, 礼装, 优雅, 氛围'},
+    { name: 'rurudo', avatar: '/my-navigation-site/images/artists/rurudo.jpg', pixiv: 'https://www.pixiv.net/users/25760573', works: ['/my-navigation-site/images/artworks/rurudo/1.jpg','/my-navigation-site/images/artworks/rurudo/2.jpg','/my-navigation-site/images/artworks/rurudo/3.jpg'] , tags: '萝莉, 可爱, 少女, 性感, 兔女郎, 萌, 制服'},
+    { name: 'しらたま❄', avatar: '/my-navigation-site/images/artists/shiratama.jpg', pixiv: 'https://www.pixiv.net/users/705370', works: ['/my-navigation-site/images/artworks/shiratama/1.jpg','/my-navigation-site/images/artworks/shiratama/2.jpg','/my-navigation-site/images/artworks/shiratama/3.jpg'] , tags: '萝莉, 可爱, 少女, 治愈, 星空, 天使, 梦幻'},
+    { name: 'こうこうや', avatar: '/my-navigation-site/images/artists/kokoya.jpg', pixiv: 'https://www.pixiv.net/users/118616623', works: ['/my-navigation-site/images/artworks/kokoya/1.jpg','/my-navigation-site/images/artworks/kokoya/2.jpg','/my-navigation-site/images/artworks/kokoya/3.jpg'] , tags: '少女, 东方, 背景, 风景, 女仆, 幻想, 可爱'},
+    { name: '落舟Pile', avatar: '/my-navigation-site/images/artists/luozhou_pile.jpg', pixiv: 'https://www.pixiv.net/users/21304996', works: ['/my-navigation-site/images/artworks/luozhou_pile/1.jpg','/my-navigation-site/images/artworks/luozhou_pile/2.jpg','/my-navigation-site/images/artworks/luozhou_pile/3.jpg'] , tags: '明日方舟, 少女, 插画, 药屋, 厚涂, 色彩, 角色'},
+    { name: 'mojo', avatar: '/my-navigation-site/images/artists/mojo.jpg', pixiv: 'https://www.pixiv.net/users/94576902', works: ['/my-navigation-site/images/artworks/mojo/1.jpg','/my-navigation-site/images/artworks/mojo/2.jpg','/my-navigation-site/images/artworks/mojo/3.jpg'] , tags: '蔚蓝档案, 机甲, 科幻, 校园, 偶像, 机械, 少女'},
+    { name: 'Nbrush19', avatar: '/my-navigation-site/images/artists/nbrush19.jpg', pixiv: 'https://www.pixiv.net/users/44895546', works: ['/my-navigation-site/images/artworks/nbrush19/1.jpg','/my-navigation-site/images/artworks/nbrush19/2.jpg','/my-navigation-site/images/artworks/nbrush19/3.jpg'] , tags: '明日方舟, 少女, 插画, Fate, 厚涂, 色彩, 优美'},
+    { name: '富士やま', avatar: '/my-navigation-site/images/artists/fujiyama.jpg', pixiv: 'https://www.pixiv.net/users/9343974', works: ['/my-navigation-site/images/artworks/fujiyama/1.jpg','/my-navigation-site/images/artworks/fujiyama/2.jpg','/my-navigation-site/images/artworks/fujiyama/3.jpg'] , tags: '少女, 游戏, 可爱, 猫耳, 女仆, 厚涂, 色彩'},
+    { name: 'ふぇありぃあい', avatar: '/my-navigation-site/images/artists/fairy_eye.jpg', pixiv: 'https://www.pixiv.net/users/1055457', works: ['/my-navigation-site/images/artworks/fairy_eye/1.jpg','/my-navigation-site/images/artworks/fairy_eye/2.jpg','/my-navigation-site/images/artworks/fairy_eye/3.jpg'] , tags: 'hololive, VTuber, 可爱, 少女, 女仆, 同人, 治愈'},
+    { name: '宮坂みゆ', avatar: '/my-navigation-site/images/artists/miyasaka_miyu.jpg', pixiv: 'https://www.pixiv.net/users/839617', works: ['/my-navigation-site/images/artworks/miyasaka_miyu/1.jpg','/my-navigation-site/images/artworks/miyasaka_miyu/2.jpg','/my-navigation-site/images/artworks/miyasaka_miyu/3.jpg'] , tags: '少女, 可爱, 双马尾, 同人, 粉发, 萝莉, 童话'},
+    { name: '飴玉コン', avatar: '/my-navigation-site/images/artists/amedama_kon.jpg', pixiv: 'https://www.pixiv.net/users/1992163', works: ['/my-navigation-site/images/artworks/amedama_kon/1.jpg','/my-navigation-site/images/artworks/amedama_kon/2.jpg','/my-navigation-site/images/artworks/amedama_kon/3.jpg'] , tags: '少女, 百合, 厚涂, 萝莉, 白髮, 泳装, 双马尾'},
+    { name: 'きょくちょ', avatar: '/my-navigation-site/images/artists/kyockcho.jpg', pixiv: 'https://www.pixiv.net/users/22782', works: ['/my-navigation-site/images/artworks/kyockcho/1.jpg','/my-navigation-site/images/artworks/kyockcho/2.jpg','/my-navigation-site/images/artworks/kyockcho/3.jpg'] , tags: '少女, 可爱, 女仆, 漫画, 制服, 校园, 萝莉'},
+    { name: '秋タケ', avatar: '/my-navigation-site/images/artists/akitake.jpg', pixiv: 'https://www.pixiv.net/users/21076169', works: ['/my-navigation-site/images/artworks/akitake/1.jpg','/my-navigation-site/images/artworks/akitake/2.jpg','/my-navigation-site/images/artworks/akitake/3.jpg'] , tags: '蔚蓝档案, 少女, 可爱, 笑容, 校园, 制服, 阳光'},
+    { name: 'ぱるふぇいと', avatar: '/my-navigation-site/images/artists/parfait.jpg', pixiv: 'https://www.pixiv.net/users/1179457', works: ['/my-navigation-site/images/artworks/parfait/1.jpg','/my-navigation-site/images/artworks/parfait/2.jpg','/my-navigation-site/images/artworks/parfait/3.jpg'] , tags: '白发, 少女, 萝莉, 可爱, 幻想, 梦幻, 天使'},
+    { name: '薄藍', avatar: '/my-navigation-site/images/artists/usui.jpg', pixiv: 'https://www.pixiv.net/users/38276220', works: ['/my-navigation-site/images/artworks/usui/1.jpg','/my-navigation-site/images/artworks/usui/2.jpg','/my-navigation-site/images/artworks/usui/3.jpg'] , tags: '少女, FGO, 幻想, 可爱, 天使, 花, 色彩'},
+    { name: '種乃なかみ', avatar: '/my-navigation-site/images/artists/taneno_nakami.jpg', pixiv: 'https://www.pixiv.net/users/12823252', works: ['/my-navigation-site/images/artworks/taneno_nakami/1.jpg','/my-navigation-site/images/artworks/taneno_nakami/2.jpg','/my-navigation-site/images/artworks/taneno_nakami/3.jpg'] , tags: '少女, 百合, 同人, 可爱, 制服, 马尾, 日常'},
+    { name: 'こんぺ伊藤', avatar: '/my-navigation-site/images/artists/konpe_ito.jpg', pixiv: 'https://www.pixiv.net/users/17777967', works: ['/my-navigation-site/images/artworks/konpe_ito/1.jpg','/my-navigation-site/images/artworks/konpe_ito/2.jpg','/my-navigation-site/images/artworks/konpe_ito/3.jpg'] , tags: '少女, 女仆, 猫耳, 双马尾, 白髮, 护士, 可爱'},
+    { name: 'いずみななせ', avatar: '/my-navigation-site/images/artists/izumi_nanase.jpg', pixiv: 'https://www.pixiv.net/users/7145395', works: ['/my-navigation-site/images/artworks/izumi_nanase/1.jpg','/my-navigation-site/images/artworks/izumi_nanase/2.jpg','/my-navigation-site/images/artworks/izumi_nanase/3.jpg'] , tags: 'VTuber, 少女, 委托, VRChat, 猫耳, 可爱, 立绘'},
+    { name: 'にんげんまめ', avatar: '/my-navigation-site/images/artists/ningen_mame.jpg', pixiv: 'https://www.pixiv.net/users/38297201', works: ['/my-navigation-site/images/artworks/ningen_mame/1.jpg','/my-navigation-site/images/artworks/ningen_mame/2.jpg','/my-navigation-site/images/artworks/ningen_mame/3.jpg'] , tags: '蔚蓝档案, 少女, 校园, 偶像, 制服, 可爱, 青春'},
+    { name: 'Dudrinm', avatar: '/my-navigation-site/images/artists/dudrinm.jpg', pixiv: 'https://www.pixiv.net/users/94061649', works: ['/my-navigation-site/images/artworks/dudrinm/1.jpg','/my-navigation-site/images/artworks/dudrinm/2.jpg','/my-navigation-site/images/artworks/dudrinm/3.jpg'] , tags: '少女, EVA, 同人, 奇幻, 鸣潮, 色彩, 原创'},
+    { name: 'Noah', avatar: '/my-navigation-site/images/artists/noah.jpg', pixiv: 'https://www.pixiv.net/users/87145717', works: ['/my-navigation-site/images/artworks/noah/1.jpg','/my-navigation-site/images/artworks/noah/2.jpg','/my-navigation-site/images/artworks/noah/3.jpg'] , tags: 'VTuber, 少女, 可爱, 天使, 幻想, 色彩, 治愈'},
+    { name: '梅原生（せい）', avatar: '/my-navigation-site/images/artists/umehara_sei.jpg', pixiv: 'https://www.pixiv.net/users/3906246', works: ['/my-navigation-site/images/artworks/umehara_sei/1.jpg','/my-navigation-site/images/artworks/umehara_sei/2.jpg','/my-navigation-site/images/artworks/umehara_sei/3.jpg'] , tags: '古风, 少女, 中华, 原创, 兽耳, 优雅, 清新'},
+    { name: 'Sua', avatar: '/my-navigation-site/images/artists/sua.jpg', pixiv: 'https://www.pixiv.net/users/9999743', works: ['/my-navigation-site/images/artworks/sua/1.jpg','/my-navigation-site/images/artworks/sua/2.jpg','/my-navigation-site/images/artworks/sua/3.jpg'] , tags: '少女, 鸣潮, 明日方舟, 原创, 色彩, 华丽, 角色'},
+    { name: '夢ノ内', avatar: '/my-navigation-site/images/artists/yume_no_uchi.jpg', pixiv: 'https://www.pixiv.net/users/229788', works: ['/my-navigation-site/images/artworks/yume_no_uchi/1.jpg','/my-navigation-site/images/artworks/yume_no_uchi/2.jpg','/my-navigation-site/images/artworks/yume_no_uchi/3.jpg'] , tags: '少女, VOCALOID, 幻想, 帅气, 动态, 色彩, 华丽'},
+    { name: '上倉エク', avatar: '/my-navigation-site/images/artists/uekura_eku.jpg', pixiv: 'https://www.pixiv.net/users/299299', works: ['/my-navigation-site/images/artworks/uekura_eku/1.jpg','/my-navigation-site/images/artworks/uekura_eku/2.jpg','/my-navigation-site/images/artworks/uekura_eku/3.jpg'] , tags: '少女, 可爱, 天使, 双马尾, 色彩, 梦幻, 治愈'},
+  ];
 
 const navItems = [
   { id: 'home', label: 'Nexus', page: 'home', keywords: '首页 主页 home' },
@@ -1037,6 +1121,177 @@ function startResize(e) {
 .artist-page {
   text-align: left;
 }
+
+.artist-search-bar {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.artist-search-wrapper {
+  display: flex;
+  align-items: center;
+  background: rgba(180,180,180,0.12);
+  border-radius: 999px;
+  padding: 0 4px 0 16px;
+  width: 100%;
+  max-width: 400px;
+}
+
+.page.light .artist-search-wrapper {
+  background: rgba(0,0,0,0.06);
+}
+
+.artist-search-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: inherit;
+  font-size: 0.95rem;
+  padding: 10px 0;
+}
+
+.artist-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
+  gap: 24px;
+}
+
+.artist-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px 24px 20px;
+  border-radius: 16px;
+  background: rgba(180, 180, 180, 0.08);
+  border: 1px solid rgba(180, 180, 180, 0.12);
+  transition: background 0.2s;
+}
+
+.artist-card:hover {
+  background: rgba(180, 180, 180, 0.15);
+}
+
+.page:not(.dark) .artist-card {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+.page:not(.dark) .artist-card:hover {
+  background: rgba(0, 0, 0, 0.07);
+}
+
+.artist-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.artist-avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.artist-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.artist-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.artist-name {
+  margin: 0 0 10px;
+  font-size: 1.5rem;
+  color: inherit;
+}
+
+.artist-links {
+  display: flex;
+  gap: 12px;
+}
+
+.pixiv-link {
+  display: inline-block;
+  padding: 4px 14px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  text-decoration: none;
+  transition: opacity 0.2s;
+  background: #0096fa;
+  color: #fff;
+}
+
+.pixiv-link:hover {
+  opacity: 0.8;
+}
+
+.artist-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.tag {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-size: 0.78rem;
+  background: rgba(128, 128, 128, 0.18);
+  color: inherit;
+}
+
+.page.light .tag {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.artist-works {
+  display: flex;
+  gap: 10px;
+}
+
+.work-thumb {
+  flex: 1;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  border-radius: 10px;
+  background: rgba(128, 128, 128, 0.15);
+  cursor: pointer;
+}
+
+.work-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.lightbox {
+  position: fixed;
+  z-index: 999;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lightbox-img {
+  max-width: 90vw;
+  max-height: 90vh;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+
 
 .page-heading {
   margin: 0;

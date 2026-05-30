@@ -403,6 +403,9 @@
             </div>
           </div>
         </div>
+        <div v-else-if="currentPage === 'artist'" class="artist-page">
+          <h2 class="page-heading">画师</h2>
+        </div>
       </main>
     </div>
   </div>
@@ -419,6 +422,7 @@ const navItems = [
   { id: 'home', label: 'Nexus', page: 'home', keywords: '首页 主页 home' },
   { id: 'web', label: '网页', page: 'web', keywords: 'web 网站' },
   { id: 'software', label: '软件', page: 'software', keywords: 'software 应用 程序' },
+  { id: 'artist', label: '画师', page: 'artist', keywords: '画师 插画 绘画 艺术' },
 ];
 
 const categoryItems = [
@@ -1028,6 +1032,10 @@ function startResize(e) {
 
 .software-page h2 {
   color: inherit;
+}
+
+.artist-page {
+  text-align: left;
 }
 
 .page-heading {

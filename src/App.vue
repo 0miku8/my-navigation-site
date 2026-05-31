@@ -1,5 +1,5 @@
 <template>
-  <div :class="['page', { dark: isDark }]">
+  <div :class="['page', { dark: isDark }]" @keydown.escape="previewImg = ''">
     <aside class="sidebar">
       <div class="sidebar-inner">
         <div class="theme-btn-wrap">
@@ -31,6 +31,7 @@
         </template>
         <div class="divider"></div>
       <main class="content">
+        <div class="page-transition">
         <template v-if="currentPage === 'home'">
           <div class="all-cards">
             <a class="tool-card" v-for="item in allToolItems" :key="item.label" :href="item.url" target="_blank" rel="noopener">
@@ -413,9 +414,9 @@
             <div class="artist-card" v-for="a in filteredArtists" :key="a.name">
               <div class="artist-header">
                 <div class="artist-avatar">
-                  <img :src="a.avatar" :alt="a.name" />
-                </div>
-                <div class="artist-info">
+                  <img :src="a.avatar" :alt="a.name" @error="onImgError($event)" />
+              </div>
+              <div class="artist-info">
                   <h3 class="artist-name">{{ a.name }}</h3>
                   <div class="artist-links">
                     <a :href="a.pixiv" target="_blank" rel="noopener" class="pixiv-link">pixiv</a>
@@ -427,11 +428,12 @@
               </div>
               <div class="artist-works" v-if="a.works && a.works.length">
                   <div class="work-thumb" v-for="(w, wi) in a.works" :key="wi" @click="previewImg = w">
-                    <img :src="w" :alt="a.name + ' work ' + (wi+1)" loading="lazy" />
+                    <img :src="w" :alt="a.name + ' work ' + (wi+1)" loading="lazy" @error="onImgError($event)" />
               </div>
             </div>
           </div>
         </div>      
+        </div>
         </div>
       </main>
 
@@ -664,6 +666,10 @@ function startResize(e) {
   document.addEventListener('mouseup', onMouseUp);
   document.body.style.cursor = 'col-resize';
   document.body.style.userSelect = 'none';
+}
+
+function onImgError(e) {
+  e.target.style.display = 'none';
 }
 </script>
 
@@ -1291,6 +1297,14 @@ function startResize(e) {
   border-radius: 8px;
 }
 
+.page-transition {
+  animation: fadeIn 0.25s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
 
 
 .page-heading {

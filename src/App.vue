@@ -405,9 +405,15 @@
           </div>
         </div>
         <div v-else-if="currentPage === 'music'" class="music-page">
-          <div class="artist-search-bar">
-            <div class="artist-search-wrapper">
-              <input class="artist-search-input" type="text" placeholder="搜索歌曲或歌手..." v-model="musicQuery" />
+          <div class="music-search-row">
+            <div class="music-random-card" @click="copyRandomSong">
+              <span class="music-random-icon">🎲</span>
+              <span class="music-random-text">随机歌曲</span>
+            </div>
+            <div class="artist-search-bar" style="flex:1">
+              <div class="artist-search-wrapper">
+                <input class="artist-search-input" type="text" placeholder="搜索歌曲或歌手..." v-model="musicQuery" />
+              </div>
             </div>
           </div>
           <div class="music-grid">
@@ -474,6 +480,16 @@ const musicQuery = ref('');
 const toast = ref(null);
 
 function copyMusic(m, e) {
+  const text = `${m.song} - ${m.artist}`;
+  navigator.clipboard.writeText(text).catch(() => {});
+  const rect = e.currentTarget.getBoundingClientRect();
+  toast.value = { text: '已复制！', x: rect.left + rect.width / 2, y: rect.top };
+  setTimeout(() => { toast.value = null; }, 1200);
+}
+
+function copyRandomSong(e) {
+  const idx = Math.floor(Math.random() * musicItems.length);
+  const m = musicItems[idx];
   const text = `${m.song} - ${m.artist}`;
   navigator.clipboard.writeText(text).catch(() => {});
   const rect = e.currentTarget.getBoundingClientRect();
@@ -2847,6 +2863,49 @@ function onImgError(e) {
 
 .page.light .tag {
   background: rgba(0, 0, 0, 0.08);
+}
+
+.music-search-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.music-random-card {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: rgba(180, 180, 180, 0.1);
+  border: 1px solid rgba(180, 180, 180, 0.15);
+  cursor: pointer;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+
+.music-random-card:hover {
+  background: rgba(180, 180, 180, 0.2);
+}
+
+.page:not(.dark) .music-random-card {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+.page:not(.dark) .music-random-card:hover {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.music-random-icon {
+  font-size: 1.1rem;
+}
+
+.music-random-text {
+  font-size: 0.9rem;
+  color: inherit;
+  white-space: nowrap;
 }
 
 .music-grid {
